@@ -1,17 +1,19 @@
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { AuthProvider } from "../lib/AuthContext";
+import { ThemeProvider, useTheme } from "../lib/ThemeContext";
 
-export default function RootLayout() {
+function RootStack() {
+  const { theme, mode } = useTheme();
   return (
-    <AuthProvider>
-      <StatusBar style="light" />
+    <>
+      <StatusBar style={mode === "dark" ? "light" : "dark"} />
       <Stack
         screenOptions={{
-          headerStyle: { backgroundColor: "#0f0f0f" },
-          headerTintColor: "#00c030",
-          headerTitleStyle: { color: "#fff", fontWeight: "bold" },
-          contentStyle: { backgroundColor: "#0f0f0f" },
+          headerStyle: { backgroundColor: theme.bg },
+          headerTintColor: theme.accent,
+          headerTitleStyle: { color: theme.text, fontWeight: "bold" },
+          contentStyle: { backgroundColor: theme.bg },
         }}
       >
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -20,6 +22,16 @@ export default function RootLayout() {
         <Stack.Screen name="movies/[id]" options={{ title: "Movie" }} />
         <Stack.Screen name="(admin)" options={{ headerShown: false }} />
       </Stack>
-    </AuthProvider>
+    </>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        <RootStack />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

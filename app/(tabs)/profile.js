@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState, useCallback } from "react";
 import {
   View,
   Text,
@@ -8,13 +8,17 @@ import {
   ActivityIndicator,
   FlatList,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { useAuth } from "../../lib/AuthContext";
+import { useTheme } from "../../lib/ThemeContext";
 import { usersAPI } from "../../lib/api";
 import MovieCard from "../../components/MovieCard";
 
+const TABS = ["Watchlist", "Watched", "Reviews"];
+
 export default function ProfileScreen() {
   const { user, logout } = useAuth();
+  const { theme } = useTheme();
   const router = useRouter();
 
   const [profile, setProfile] = useState(null);
@@ -22,287 +26,275 @@ export default function ProfileScreen() {
   const [watched, setWatched] = useState([]);
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("Watchlist");
 
-  const [showAllWatchlist, setShowAllWatchlist] = useState(false);
-  const [showAllWatched, setShowAllWatched] = useState(false);
-  const [showAllReviews, setShowAllReviews] = useState(false);
-
-  useEffect(() => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
-
-    Promise.all([
-      usersAPI.get(user.userno),
-      usersAPI.getWatchlist(user.userno),
-      usersAPI.getWatched(user.userno),
-      usersAPI.getReviews(user.userno),
-    ])
-      .then(([{ data: p }, { data: wl }, { data: wa }, { data: re }]) => {
-        setProfile(p);
-        setWatchlist(wl);
-        setWatched(wa);
-        setReviews(re);
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false));
-  }, [user]);
+  useFocusEffect(
+    useCallback(() => {
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      Promise.all([
+        usersAPI.get(user.userno),
+        usersAPI.getWatchlist(user.userno),
+        usersAPI.getWatched(user.userno),
+        usersAPI.getReviews(user.userno),
+      ])
+        .then(([{ data: p }, { data: wl }, { data: wa }, { data: re }]) => {
+          setProfile(p);
+          setWatchlist(wl);
+          setWatched(wa);
+          setReviews(re);
+        })
+        .catch(console.error)
+        .finally(() => setLoading(false));
+    }, [user]),
+  );
 
   if (!user) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.title}>Sign in to view your profile</Text>
-
+      <View style={[styles.center, { backgroundColor: theme.bg }]}>
+        <Text style={styles.emptyIcon}>🎬</Text>
+        <Text style={[styles.emptyTitle, { color: theme.text }]}>You're not signed in</Text>
+        <Text style={[styles.emptySubtitle, { color: theme.subtext }]}>Sign in to track your movies</Text>
         <TouchableOpacity
-          style={styles.btn}
+          style={[styles.btn, { backgroundColor: theme.accent }]}
           onPress={() => router.push("/(auth)/login")}
         >
           <Text style={styles.btnText}>Sign In</Text>
         </TouchableOpacity>
-
         <TouchableOpacity
-          style={[styles.btn, styles.btnOutline]}
+          style={[styles.btnOutline, { borderColor: theme.accent }]}
           onPress={() => router.push("/(auth)/signup")}
         >
-          <Text style={[styles.btnText, { color: "#00c030" }]}>
-            Create Account
-          </Text>
+          <Text style={[styles.btnOutlineText, { color: theme.accent }]}>Create Account</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
   if (loading)
-    return <ActivityIndicator color="#00c030" style={{ marginTop: 40 }} />;
+    return <ActivityIndicator color={theme.accent} style={{ marginTop: 60, backgroundColor: theme.bg, flex: 1 }} />;
 
   return (
-    <ScrollView
-      style={styles.container}
-      contentContainerStyle={{ padding: 16 }}
-    >
-      <Text style={styles.username}>{profile?.username}</Text>
+    <View style={[styles.container, { backgroundColor: theme.bg }]}>
+      {/* Header */}
+      <View style={[styles.header, { backgroundColor: theme.card, borderBottomColor: theme.border }]}>
+        <View style={styles.avatar}>
+          <Text style={styles.avatarText}>
+            {profile?.username?.[0]?.toUpperCase() ?? "?"}
+          </Text>
+        </View>
+        <Text style={[styles.username, { color: theme.text }]}>{profile?.username}</Text>
+        {profile?.bio ? <Text style={[styles.bio, { color: theme.subtext }]}>{profile.bio}</Text> : null}
+        <TouchableOpacity style={styles.signOutBtn} onPress={logout}>
+          <Text style={styles.signOutText}>Sign Out</Text>
+        </TouchableOpacity>
+      </View>
 
-      {profile?.bio ? <Text style={styles.bio}>{profile.bio}</Text> : null}
-
-      <View style={styles.stats}>
+      {/* Tab Bar */}
+      <View style={[styles.tabBar, { backgroundColor: theme.card, borderBottomColor: theme.border }]}>
         {[
-          ["Films", profile?.stats?.totalwatched],
-          ["Reviews", profile?.stats?.totalreviews],
-          ["Watchlist", profile?.stats?.watchlistcount],
-        ].map(([label, val]) => (
-          <View key={label} style={styles.stat}>
-            <Text style={styles.statNum}>{val ?? 0}</Text>
-            <Text style={styles.statLabel}>{label}</Text>
-          </View>
+          { label: "Watchlist", count: watchlist.length },
+          { label: "Watched", count: watched.length },
+          { label: "Reviews", count: reviews.length },
+        ].map(({ label, count }) => (
+          <TouchableOpacity
+            key={label}
+            style={[
+              styles.tabItem,
+              activeTab === label && { borderBottomColor: theme.accent },
+            ]}
+            onPress={() => setActiveTab(label)}
+          >
+            <Text
+              style={[
+                styles.tabText,
+                { color: theme.subtext },
+                activeTab === label && { color: theme.accent },
+              ]}
+            >
+              {label} ({count})
+            </Text>
+          </TouchableOpacity>
         ))}
       </View>
 
-      {/* WATCHLIST */}
-      {watchlist.length > 0 && (
-        <>
-          <Text style={styles.sectionTitle}>Watchlist</Text>
-
-          <FlatList
-            data={showAllWatchlist ? watchlist : watchlist.slice(0, 6)}
-            keyExtractor={(item) => item.movieno}
-            numColumns={3}
-            scrollEnabled={false}
-            renderItem={({ item }) => <MovieCard movie={item} small />}
-          />
-
-          {watchlist.length > 6 && (
-            <TouchableOpacity
-              onPress={() => setShowAllWatchlist(!showAllWatchlist)}
-            >
-              <Text style={styles.seeMore}>
-                {showAllWatchlist ? "Show Less" : "See All"}
-              </Text>
-            </TouchableOpacity>
+      {/* Profile Tab */}
+      {activeTab === "Watchlist" && (
+        <ScrollView contentContainerStyle={styles.tabContent}>
+          {watchlist.length === 0 ? (
+            <Text style={[styles.empty, { color: theme.subtext }]}>No movies in your watchlist</Text>
+          ) : (
+            <FlatList
+              data={watchlist}
+              keyExtractor={(item) => String(item.movieno)}
+              numColumns={3}
+              scrollEnabled={false}
+              renderItem={({ item }) => <MovieCard movie={item} small />}
+            />
           )}
-        </>
+        </ScrollView>
       )}
 
-      {/* WATCHED */}
-      {watched.length > 0 && (
-        <>
-          <Text style={styles.sectionTitle}>Watched</Text>
-
-          <FlatList
-            data={showAllWatched ? watched : watched.slice(0, 6)}
-            keyExtractor={(item) => item.movieno}
-            numColumns={3}
-            scrollEnabled={false}
-            renderItem={({ item }) => <MovieCard movie={item} small />}
-          />
-
-          {watched.length > 6 && (
-            <TouchableOpacity
-              onPress={() => setShowAllWatched(!showAllWatched)}
-            >
-              <Text style={styles.seeMore}>
-                {showAllWatched ? "Show Less" : "See All"}
-              </Text>
-            </TouchableOpacity>
-          )}
-        </>
+      {/* Watched Tab */}
+      {activeTab === "Watched" && (
+        <FlatList
+          data={watched}
+          keyExtractor={(item) => String(item.movieno)}
+          numColumns={3}
+          contentContainerStyle={styles.tabContent}
+          ListEmptyComponent={
+            <Text style={[styles.empty, { color: theme.subtext }]}>No watched movies yet</Text>
+          }
+          renderItem={({ item }) => <MovieCard movie={item} small />}
+        />
       )}
 
-      {/* REVIEWS */}
-      {reviews.length > 0 && (
-        <>
-          <Text style={styles.sectionTitle}>Reviews</Text>
-
-          {(showAllReviews ? reviews : reviews.slice(0, 3)).map((r) => (
-            <View key={r.reviewno} style={styles.reviewItem}>
-              <View style={styles.reviewHeader}>
-                <Text style={styles.reviewUser}>{r.username}</Text>
-
-                <Text style={styles.reviewRating}>{"★".repeat(r.rating)}</Text>
+      {/* Reviews Tab */}
+      {activeTab === "Reviews" && (
+        <FlatList
+          data={reviews}
+          keyExtractor={(item) => String(item.reviewno)}
+          contentContainerStyle={styles.tabContent}
+          ListEmptyComponent={<Text style={[styles.empty, { color: theme.subtext }]}>No reviews yet</Text>}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={[styles.reviewCard, { backgroundColor: theme.card2, borderColor: theme.border }]}
+              onPress={() => router.push(`/movies/${item.movieno}`)}
+            >
+              <View style={styles.reviewCardHeader}>
+                <Text style={[styles.reviewMovieTitle, { color: theme.text }]} numberOfLines={1}>
+                  {item.title}
+                </Text>
+                <Text style={styles.reviewStars}>
+                  {"★".repeat(item.rating)}
+                </Text>
               </View>
-
-              {r.content ? (
-                <Text style={styles.reviewContent}>{r.content}</Text>
+              {item.content ? (
+                <Text style={[styles.reviewContent, { color: theme.subtext }]} numberOfLines={3}>
+                  {item.content}
+                </Text>
               ) : null}
-            </View>
-          ))}
-
-          {reviews.length > 3 && (
-            <TouchableOpacity
-              onPress={() => setShowAllReviews(!showAllReviews)}
-            >
-              <Text style={styles.seeMore}>
-                {showAllReviews ? "Show Less" : "See All Reviews"}
+              <Text style={[styles.reviewDate, { color: theme.subtext }]}>
+                {new Date(item.datereviewed).toLocaleDateString()}
               </Text>
             </TouchableOpacity>
           )}
-        </>
+        />
       )}
-
-      <TouchableOpacity
-        style={[styles.btn, { marginTop: 24, backgroundColor: "#333" }]}
-        onPress={logout}
-      >
-        <Text style={[styles.btnText, { color: "#ff4444" }]}>Sign Out</Text>
-      </TouchableOpacity>
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#0f0f0f",
-  },
+  container: { flex: 1, backgroundColor: "#0f0f0f" },
 
   center: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#0f0f0f",
+    padding: 24,
     gap: 12,
   },
-
-  title: {
-    color: "#fff",
-    fontSize: 18,
-    marginBottom: 8,
-  },
-
-  username: {
-    color: "#fff",
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-
-  bio: {
-    color: "#aaa",
-    marginTop: 4,
-    marginBottom: 12,
-  },
-
-  stats: {
-    flexDirection: "row",
-    gap: 40,
-    marginVertical: 16,
-    justifyContent: "center",
-  },
-
-  stat: {
-    alignItems: "center",
-  },
-
-  statNum: {
-    color: "#00c030",
-    fontSize: 22,
-    fontWeight: "bold",
-  },
-
-  statLabel: {
-    color: "#888",
-    fontSize: 12,
-  },
-
-  sectionTitle: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 12,
-    textAlign: "center",
-    marginTop: 12,
-  },
-
-  seeMore: {
-    color: "#00c030",
-    textAlign: "center",
-    marginVertical: 12,
-    fontWeight: "bold",
-  },
+  emptyIcon: { fontSize: 48, marginBottom: 8 },
+  emptyTitle: { color: "#fff", fontSize: 20, fontWeight: "bold" },
+  emptySubtitle: { color: "#888", marginBottom: 8 },
 
   btn: {
     backgroundColor: "#00c030",
     padding: 14,
-    borderRadius: 8,
-    alignSelf: "center",
+    borderRadius: 10,
     alignItems: "center",
-    width: "90%",
+    width: "100%",
   },
-
+  btnText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
   btnOutline: {
-    backgroundColor: "transparent",
     borderWidth: 1,
     borderColor: "#00c030",
+    padding: 14,
+    borderRadius: 10,
+    alignItems: "center",
+    width: "100%",
   },
+  btnOutlineText: { color: "#00c030", fontWeight: "bold", fontSize: 16 },
 
-  btnText: {
+  header: {
+    alignItems: "center",
+    paddingTop: 28,
+    paddingBottom: 20,
+    paddingHorizontal: 16,
+    backgroundColor: "#141414",
+    borderBottomWidth: 1,
+    borderBottomColor: "#222",
+  },
+  signOutBtn: { marginTop: 8, padding: 6 },
+  signOutText: { color: "#ff4444", fontSize: 13, fontWeight: "600" },
+  settingsBtn: { marginTop: 4, padding: 6 },
+  avatar: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: "#00c030",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+  },
+  avatarText: { color: "#fff", fontSize: 30, fontWeight: "bold" },
+  username: { color: "#fff", fontSize: 22, fontWeight: "bold" },
+  bio: { color: "#888", fontSize: 13, marginTop: 4, textAlign: "center" },
+  tabBar: {
+    flexDirection: "row",
+    backgroundColor: "#141414",
+    borderBottomWidth: 1,
+    borderBottomColor: "#222",
+  },
+  tabItem: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: "center",
+    borderBottomWidth: 2,
+    borderBottomColor: "transparent",
+  },
+  tabItemActive: { borderBottomColor: "#00c030" },
+  tabText: { color: "#888", fontWeight: "600", fontSize: 14 },
+  tabTextActive: { color: "#00c030" },
+
+  tabContent: { padding: 12, paddingBottom: 32 },
+
+  sectionTitle: {
     color: "#fff",
-    fontWeight: "bold",
     fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 10,
+    marginTop: 4,
   },
+  empty: { color: "#555", textAlign: "center", marginTop: 40, fontSize: 15 },
 
-  reviewItem: {
+  reviewCard: {
     backgroundColor: "#1a1a1a",
-    padding: 12,
-    borderRadius: 8,
-    marginBottom: 8,
+    borderRadius: 10,
+    padding: 14,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: "#2a2a2a",
   },
-
-  reviewHeader: {
+  reviewCardHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 4,
+    alignItems: "center",
+    marginBottom: 6,
   },
-
-  reviewUser: {
-    color: "#00c030",
+  reviewMovieTitle: {
+    color: "#fff",
     fontWeight: "bold",
+    fontSize: 15,
+    flex: 1,
+    marginRight: 8,
   },
-
-  reviewRating: {
-    color: "#ffd700",
-  },
-
-  reviewContent: {
-    color: "#ccc",
-  },
+  reviewStars: { color: "#ffd700", fontSize: 13 },
+  reviewContent: { color: "#aaa", fontSize: 13, lineHeight: 19 },
+  reviewDate: { color: "#555", fontSize: 11, marginTop: 6 },
 });

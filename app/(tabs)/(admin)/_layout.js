@@ -2,9 +2,11 @@ import { Stack } from "expo-router";
 import { TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useTheme } from "../../../lib/ThemeContext";
 
 export default function AdminLayout() {
   const router = useRouter();
+  const { theme } = useTheme();
 
   const handleBack = () => {
     if (router.canGoBack()) {
@@ -17,13 +19,13 @@ export default function AdminLayout() {
   return (
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: "#0f0f0f" },
-        headerTintColor: "#00c030",
-        headerTitleStyle: { color: "#fff", fontWeight: "bold" },
-        contentStyle: { backgroundColor: "#0f0f0f" },
+        headerStyle: { backgroundColor: theme.bg },
+        headerTintColor: theme.accent,
+        headerTitleStyle: { color: theme.text, fontWeight: "bold" },
+        contentStyle: { backgroundColor: theme.bg },
         headerLeft: () => (
           <TouchableOpacity onPress={handleBack} style={{ marginRight: 8 }}>
-            <Ionicons name="arrow-back" size={24} color="#00c030" />
+            <Ionicons name="arrow-back" size={24} color={theme.accent} />
           </TouchableOpacity>
         ),
       }}
@@ -35,6 +37,7 @@ export default function AdminLayout() {
       <Stack.Screen name="movies" options={{ title: "Manage Movies" }} />
       <Stack.Screen name="add-movie" options={{ title: "Add Movie" }} />
       <Stack.Screen name="edit-movie" options={{ title: "Edit Movie" }} />
+      <Stack.Screen name="users" options={{ title: "All Users" }} />
     </Stack>
   );
 }

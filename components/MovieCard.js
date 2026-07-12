@@ -1,8 +1,10 @@
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
+import { useTheme } from "../lib/ThemeContext";
 
 export default function MovieCard({ movie, small = false }) {
   const router = useRouter();
+  const { theme } = useTheme();
   const size = small ? styles.small : styles.normal;
 
   return (
@@ -11,15 +13,34 @@ export default function MovieCard({ movie, small = false }) {
       onPress={() => router.push(`/movies/${movie.movieno}`)}
     >
       {movie.poster_url ? (
-        <Image source={{ uri: movie.poster_url }} style={[styles.poster, small ? styles.posterSmall : styles.posterNormal]} resizeMode="cover" />
+        <Image
+          source={{ uri: movie.poster_url }}
+          style={[
+            styles.poster,
+            small ? styles.posterSmall : styles.posterNormal,
+            { backgroundColor: theme.card2 },
+          ]}
+          resizeMode="cover"
+        />
       ) : (
-        <View style={[styles.poster, small ? styles.posterSmall : styles.posterNormal, styles.noImage]}>
+        <View
+          style={[
+            styles.poster,
+            small ? styles.posterSmall : styles.posterNormal,
+            styles.noImage,
+            { backgroundColor: theme.card2 },
+          ]}
+        >
           <Text style={styles.noImageText}>🎬</Text>
         </View>
       )}
-      <Text style={styles.title} numberOfLines={2}>{movie.title}</Text>
+      <Text style={[styles.title, { color: theme.text }]} numberOfLines={2}>
+        {movie.title}
+      </Text>
       {movie.avgrating > 0 && (
-        <Text style={styles.rating}>⭐ {Number(movie.avgrating).toFixed(1)}</Text>
+        <Text style={styles.rating}>
+          ⭐ {Number(movie.avgrating).toFixed(1)}
+        </Text>
       )}
     </TouchableOpacity>
   );

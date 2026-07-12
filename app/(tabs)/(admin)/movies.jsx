@@ -10,9 +10,11 @@ import {
 } from "react-native";
 import { useRouter, useFocusEffect } from "expo-router";
 import { adminAPI } from "../../../lib/api";
+import { useTheme } from "../../../lib/ThemeContext";
 
 export default function AdminMoviesScreen() {
   const router = useRouter();
+  const { theme } = useTheme();
   const [movies, setMovies] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -54,12 +56,12 @@ export default function AdminMoviesScreen() {
   };
 
   if (loading)
-    return <ActivityIndicator color="#00c030" style={{ marginTop: 40 }} />;
+    return <ActivityIndicator color={theme.accent} style={{ marginTop: 40, flex: 1, backgroundColor: theme.bg }} />;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: theme.bg }]}>
       <TouchableOpacity
-        style={styles.addBtn}
+        style={[styles.addBtn, { backgroundColor: theme.accent }]}
         onPress={() => router.push("/(admin)/add-movie")}
       >
         <Text style={styles.addBtnText}>+ Add Movie</Text>
@@ -70,17 +72,17 @@ export default function AdminMoviesScreen() {
         keyExtractor={(item) => String(item.movieno)}
         contentContainerStyle={{ padding: 16 }}
         renderItem={({ item }) => (
-          <View style={styles.row}>
+          <View style={[styles.row, { backgroundColor: theme.card2, borderColor: theme.border2 }]}>
             <View style={styles.info}>
-              <Text style={styles.title} numberOfLines={1}>
+              <Text style={[styles.title, { color: theme.text }]} numberOfLines={1}>
                 {item.title}
               </Text>
-              <Text style={styles.sub}>
+              <Text style={[styles.sub, { color: theme.subtext }]}>
                 {item.releaseyear} · {item.genres}
               </Text>
             </View>
             <TouchableOpacity
-              style={styles.editBtn}
+              style={[styles.editBtn, { borderColor: theme.accent }]}
               onPress={() =>
                 router.push({
                   pathname: "/(admin)/edit-movie",
@@ -88,7 +90,7 @@ export default function AdminMoviesScreen() {
                 })
               }
             >
-              <Text style={styles.editText}>Edit</Text>
+              <Text style={[styles.editText, { color: theme.accent }]}>Edit</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.deleteBtn}

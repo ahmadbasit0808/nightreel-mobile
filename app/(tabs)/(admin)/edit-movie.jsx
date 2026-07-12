@@ -11,6 +11,7 @@ import {
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { adminAPI } from "../../../lib/api";
+import { useTheme } from "../../../lib/ThemeContext";
 
 const FIELDS = [
   { key: "title", label: "Title", placeholder: "Movie title" },
@@ -39,6 +40,7 @@ const FIELDS = [
 
 export default function EditMovieScreen() {
   const router = useRouter();
+  const { theme } = useTheme();
   const { movie: movieParam } = useLocalSearchParams();
   const parsed = movieParam ? JSON.parse(movieParam) : {};
 
@@ -71,16 +73,16 @@ export default function EditMovieScreen() {
 
   return (
     <ScrollView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: theme.bg }]}
       contentContainerStyle={{ padding: 16 }}
     >
       {FIELDS.map(({ key, label, placeholder, keyboardType, multiline }) => (
         <View key={key} style={styles.field}>
-          <Text style={styles.label}>{label}</Text>
+          <Text style={[styles.label, { color: theme.subtext }]}>{label}</Text>
           <TextInput
-            style={[styles.input, multiline && styles.multiline]}
+            style={[styles.input, multiline && styles.multiline, { backgroundColor: theme.card2, color: theme.text, borderColor: theme.border2 }]}
             placeholder={placeholder}
-            placeholderTextColor="#555"
+            placeholderTextColor={theme.subtext}
             keyboardType={keyboardType || "default"}
             multiline={multiline}
             value={form[key] ? String(form[key]) : ""}
@@ -90,7 +92,7 @@ export default function EditMovieScreen() {
       ))}
 
       <TouchableOpacity
-        style={styles.btn}
+        style={[styles.btn, { backgroundColor: theme.accent }]}
         onPress={handleSubmit}
         disabled={loading}
       >

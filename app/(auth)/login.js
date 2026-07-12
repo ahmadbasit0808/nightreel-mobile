@@ -12,9 +12,11 @@ import {
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../../lib/AuthContext";
+import { useTheme } from "../../lib/ThemeContext";
 
 export default function LoginScreen() {
   const { login } = useAuth();
+  const { theme } = useTheme();
   const router = useRouter();
   const [form, setForm] = useState({ username: "", password: "" });
   const [error, setError] = useState("");
@@ -40,43 +42,42 @@ export default function LoginScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={[styles.container, { backgroundColor: theme.bg }]}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <Text style={styles.title}>Nightreel</Text>
-      <Text style={styles.subtitle}>Sign in to your account</Text>
+      <Text style={[styles.title, { color: theme.accent }]}>Nightreel</Text>
+      <Text style={[styles.subtitle, { color: theme.subtext }]}>Sign in to your account</Text>
 
       {error ? <Text style={styles.error}>{error}</Text> : null}
 
       <TextInput
-        style={styles.input}
+        style={[styles.input, { backgroundColor: theme.card2, color: theme.text, borderColor: theme.border2 }]}
         placeholder="Username or email"
-        placeholderTextColor="#666"
+        placeholderTextColor={theme.subtext}
         autoCapitalize="none"
         value={form.username}
         onChangeText={(v) => setForm((f) => ({ ...f, username: v }))}
       />
-      <View style={styles.passwordContainer}>
+      <View style={[styles.passwordContainer, { backgroundColor: theme.card2, borderColor: theme.border2 }]}>
         <TextInput
-          style={styles.passwordInput}
+          style={[styles.passwordInput, { color: theme.text }]}
           placeholder="Password"
-          placeholderTextColor="#666"
+          placeholderTextColor={theme.subtext}
           secureTextEntry={!showPassword}
           value={form.password}
           onChangeText={(v) => setForm((f) => ({ ...f, password: v }))}
         />
-
         <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
           <Ionicons
             name={showPassword ? "eye-off-outline" : "eye-outline"}
             size={22}
-            color="#888"
+            color={theme.subtext}
           />
         </TouchableOpacity>
       </View>
 
       <TouchableOpacity
-        style={styles.btn}
+        style={[styles.btn, { backgroundColor: theme.accent }]}
         onPress={handleLogin}
         disabled={loading}
       >
@@ -88,7 +89,7 @@ export default function LoginScreen() {
       </TouchableOpacity>
 
       <TouchableOpacity onPress={() => router.push("/(auth)/signup")}>
-        <Text style={styles.link}>Don't have an account? Sign up</Text>
+        <Text style={[styles.link, { color: theme.accent }]}>Don't have an account? Sign up</Text>
       </TouchableOpacity>
     </KeyboardAvoidingView>
   );

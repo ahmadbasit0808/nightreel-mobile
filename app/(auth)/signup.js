@@ -13,9 +13,11 @@ import {
 import { useRouter } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "../../lib/AuthContext";
+import { useTheme } from "../../lib/ThemeContext";
 
 export default function SignupScreen() {
   const { signup } = useAuth();
+  const { theme } = useTheme();
   const router = useRouter();
   const [form, setForm] = useState({
     username: "",
@@ -46,9 +48,9 @@ export default function SignupScreen() {
 
   const field = (key, placeholder, opts = {}) => (
     <TextInput
-      style={styles.input}
+      style={[styles.input, { backgroundColor: theme.card2, color: theme.text, borderColor: theme.border2 }]}
       placeholder={placeholder}
-      placeholderTextColor="#666"
+      placeholderTextColor={theme.subtext}
       value={form[key]}
       onChangeText={(v) => setForm((f) => ({ ...f, [key]: v }))}
       {...opts}
@@ -57,41 +59,37 @@ export default function SignupScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: "#0f0f0f" }}
+      style={{ flex: 1, backgroundColor: theme.bg }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
       <ScrollView contentContainerStyle={styles.container}>
-        <Text style={styles.title}>Create Account</Text>
+        <Text style={[styles.title, { color: theme.accent }]}>Create Account</Text>
 
         {error ? <Text style={styles.error}>{error}</Text> : null}
 
         {field("username", "Username", { autoCapitalize: "none" })}
-        {field("email", "Email", {
-          autoCapitalize: "none",
-          keyboardType: "email-address",
-        })}
-        <View style={styles.passwordContainer}>
+        {field("email", "Email", { autoCapitalize: "none", keyboardType: "email-address" })}
+        <View style={[styles.passwordContainer, { backgroundColor: theme.card2, borderColor: theme.border2 }]}>
           <TextInput
-            style={styles.passwordInput}
+            style={[styles.passwordInput, { color: theme.text }]}
             placeholder="Password"
-            placeholderTextColor="#666"
+            placeholderTextColor={theme.subtext}
             value={form.password}
             secureTextEntry={!showPassword}
             onChangeText={(v) => setForm((f) => ({ ...f, password: v }))}
           />
-
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
             <Ionicons
               name={showPassword ? "eye-off-outline" : "eye-outline"}
               size={22}
-              color="#888"
+              color={theme.subtext}
             />
           </TouchableOpacity>
         </View>
         {field("bio", "Bio (optional)", { multiline: true })}
 
         <TouchableOpacity
-          style={styles.btn}
+          style={[styles.btn, { backgroundColor: theme.accent }]}
           onPress={handleSignup}
           disabled={loading}
         >
@@ -103,7 +101,7 @@ export default function SignupScreen() {
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => router.push("/(auth)/login")}>
-          <Text style={styles.link}>Already have an account? Sign in</Text>
+          <Text style={[styles.link, { color: theme.accent }]}>Already have an account? Sign in</Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
