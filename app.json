@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "Nightreel",
+    "slug": "nightreel-mobile",
+    "version": "1.0.0",
+    "scheme": "nightreel",
+    "platforms": ["ios", "android"],
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#000",
+    "icon": "./assets/icon.jpg",
+    "favicon": "./assets/favicon.jpg",
+    "splash": {
+      "image": "./assets/icon.jpg",
+      "resizeMode": "contain",
+      "backgroundColor": "#000"
+    },
+    "plugins": ["expo-router"],
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.jpg",
+        "backgroundColor": "#000"
+      }
+    },
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
