@@ -2,9 +2,11 @@ import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { AuthProvider } from "../lib/AuthContext";
 import { ThemeProvider, useTheme } from "../lib/ThemeContext";
+import { useOTAUpdate } from "../lib/useOTAUpdate";
 
 function RootStack() {
   const { theme, mode } = useTheme();
+  useOTAUpdate();
   return (
     <>
       <StatusBar style={mode === "dark" ? "light" : "dark"} />
@@ -20,7 +22,6 @@ function RootStack() {
         <Stack.Screen name="(auth)/login" options={{ title: "Sign In" }} />
         <Stack.Screen name="(auth)/signup" options={{ title: "Create Account" }} />
         <Stack.Screen name="movies/[id]" options={{ title: "Movie" }} />
-        <Stack.Screen name="(admin)" options={{ headerShown: false }} />
       </Stack>
     </>
   );

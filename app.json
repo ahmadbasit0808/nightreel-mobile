@@ -10,22 +10,32 @@
     ],
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
-    "backgroundColor": "#000",
-    "icon": "./assets/icon.jpg",
-    "favicon": "./assets/favicon.jpg",
+    "backgroundColor": "#000000",
+    "icon": "./assets/icon.png",
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "splash": {
-      "image": "./assets/icon.jpg",
+      "image": "./assets/icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#000"
+      "backgroundColor": "#000000"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-updates",
+      "expo-font"
     ],
+    "updates": {
+      "url": "https://u.expo.dev/b77197e7-0fd3-4ad4-a519-c7af150d26ed"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "android": {
       "package": "com.nightreel.app",
       "adaptiveIcon": {
-        "foregroundImage": "./assets/icon.jpg",
-        "backgroundColor": "#000"
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#000000"
       }
     },
     "experiments": {

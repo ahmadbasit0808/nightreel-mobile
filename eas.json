@@ -4,11 +4,19 @@
   },
   "build": {
     "preview": {
+      "channel": "preview",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://nightreel-backend-production.up.railway.app"
+      },
       "android": {
         "buildType": "apk"
       }
     },
     "production": {
+      "channel": "production",
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://nightreel-backend-production.up.railway.app"
+      },
       "android": {
         "buildType": "app-bundle"
       }

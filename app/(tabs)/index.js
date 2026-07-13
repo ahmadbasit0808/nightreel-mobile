@@ -35,7 +35,7 @@ export default function HomeScreen() {
           </View>
         </View>
         <View style={styles.heroVisual}>
-          <Image source={require("../../assets/images/hero.png")} style={styles.heroPoster} />
+          <Image source={require("../../assets/images/hero.png")} style={styles.heroPoster} resizeMode="contain" />
         </View>
       </View>
 
@@ -66,7 +66,7 @@ const styles = StyleSheet.create({
   secondaryBtn: { borderWidth: 1, paddingVertical: 12, paddingHorizontal: 16, borderRadius: 10, marginBottom: 10 },
   secondaryBtnText: { fontWeight: "700" },
   heroVisual: { alignItems: "center", marginTop: 8 },
-  heroPoster: { height: 250, objectFit: "contain" },
+  heroPoster: { height: 250, width: "100%" },
   statsRow: { flexDirection: "row", justifyContent: "space-between", marginTop: 18 },
   statBox: { flex: 1, borderRadius: 12, paddingVertical: 12, paddingHorizontal: 8, marginHorizontal: 4, alignItems: "center" },
   statValue: { color: "#E8B94E", fontSize: 16, fontWeight: "700" },

@@ -15,7 +15,7 @@ export default function MoviesScreen() {
   const [loadingMore, setLoadingMore] = useState(false);
 
   const fetchMovies = useCallback(
-    async (pageNum = 1, query = search, reset = false) => {
+    async (pageNum = 1, query = "", reset = false) => {
       if (pageNum === 1) setLoading(true);
       else setLoadingMore(true);
       try {
@@ -30,7 +30,7 @@ export default function MoviesScreen() {
         setLoadingMore(false);
       }
     },
-    [search],
+    [],
   );
 
   useFocusEffect(
@@ -41,13 +41,12 @@ export default function MoviesScreen() {
   );
 
   useEffect(() => {
-    if (search === "") return;
     const timer = setTimeout(() => fetchMovies(1, search, true), 400);
     return () => clearTimeout(timer);
-  }, [search]);
+  }, [search, fetchMovies]);
 
   const loadMore = () => {
-    if (!loadingMore && page < totalPages) fetchMovies(page + 1);
+    if (!loadingMore && page < totalPages) fetchMovies(page + 1, search);
   };
 
   return (
