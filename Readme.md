@@ -2,6 +2,28 @@
 
 Nightreel is a mobile app for tracking movies you watch, building a watchlist, and writing reviews.
 
+## Screenshots
+
+|                            Home                             |                           Movies                            |                        Movies Search                        |
+| :---------------------------------------------------------: | :---------------------------------------------------------: | :---------------------------------------------------------: |
+| <img src="docs/Screenshot_20260715-143058.jpg" width="220"> | <img src="docs/Screenshot_20260715-143418.jpg" width="220"> | <img src="docs/Screenshot_20260715-143129.jpg" width="220"> |
+
+|                         Movie Info                          |                          Top Rated                          |                        Profile Guest                        |
+| :---------------------------------------------------------: | :---------------------------------------------------------: | :---------------------------------------------------------: |
+| <img src="docs/Screenshot_20260715-143137.jpg" width="220"> | <img src="docs/Screenshot_20260715-143155.jpg" width="220"> | <img src="docs/Screenshot_20260715-143201.jpg" width="220"> |
+
+|                          Settings                           |                       Create Account                        |                           Sign In                           |
+| :---------------------------------------------------------: | :---------------------------------------------------------: | :---------------------------------------------------------: |
+| <img src="docs/Screenshot_20260715-143204.jpg" width="220"> | <img src="docs/Screenshot_20260715-143317.jpg" width="220"> | <img src="docs/Screenshot_20260715-143332.jpg" width="220"> |
+
+|                          Watchlist                          |                           Watched                           |                           Reviews                           |
+| :---------------------------------------------------------: | :---------------------------------------------------------: | :---------------------------------------------------------: |
+| <img src="docs/Screenshot_20260715-143425.jpg" width="220"> | <img src="docs/Screenshot_20260715-143425.jpg" width="220"> | <img src="docs/Screenshot_20260715-143428.jpg" width="220"> |
+
+|                       Admin Dashbaord                       |                        Manage Movies                        |                            Users                            |
+| :---------------------------------------------------------: | :---------------------------------------------------------: | :---------------------------------------------------------: |
+| <img src="docs/Screenshot_20260715-143606.jpg" width="220"> | <img src="docs/Screenshot_20260715-143620.jpg" width="220"> | <img src="docs/Screenshot_20260715-143428.jpg" width="220"> |
+
 ## Tech Stack
 
 - **Expo** (managed workflow)
